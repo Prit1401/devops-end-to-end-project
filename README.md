@@ -29,3 +29,10 @@ This project documents my hands-on practice with Linux, shell scripting, Git, an
 
 ## Learning Goal
 Build practical Linux and Git skills and apply a professional Git branching, review, and release workflow.
+
+## Git Workflow
+
+- Main branch: stable project version
+- Feature branches: isolated development work
+- Pull requests: review changes before merging
+- Tags and releases: identify stable project versions
