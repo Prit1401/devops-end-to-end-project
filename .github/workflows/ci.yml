@@ -62,6 +62,10 @@ jobs:
           role-to-assume: arn:aws:iam::732963826383:role/GitHubActions-ECR-Push-Role
           aws-region: eu-north-1
 
+      - name: Debug GitHub OIDC claims
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: github/actions-oidc-debugger@v1
+
       - name: Login to Amazon ECR
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         id: login-ecr
