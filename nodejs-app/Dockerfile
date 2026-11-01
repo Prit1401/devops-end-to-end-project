@@ -17,7 +17,8 @@ ENV PORT=3000
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm ci --omit=dev && npm cache clean --force \
+    && rm -rf /usr/local/lib/node_modules/npm
 
 COPY --from=build /app/server.js ./server.js
 COPY --from=build /app/app-logic.js ./app-logic.js
@@ -26,4 +27,4 @@ USER node
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
