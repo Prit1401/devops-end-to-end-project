@@ -55,16 +55,39 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
+      - name: Verify GitHub OIDC claims
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          TOKEN_RESPONSE=$(curl -fsS \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com")
+
+          TOKEN=$(printf '%s' "$TOKEN_RESPONSE" | jq -er '.value')
+
+          TOKEN="$TOKEN" python3 - <<'PY'
+          import os
+          import json
+          import base64
+
+          token = os.environ["TOKEN"]
+          payload = token.split(".")[1]
+          payload += "=" * (-len(payload) % 4)
+
+          claims = json.loads(
+              base64.urlsafe_b64decode(payload)
+          )
+
+          print("OIDC Audience:", claims.get("aud"))
+          print("OIDC Subject:", claims.get("sub"))
+          PY
+
       - name: Configure AWS credentials
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::732963826383:role/GitHubActions-ECR-Push-Role
           aws-region: eu-north-1
-
-      - name: Debug GitHub OIDC claims
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: github/actions-oidc-debugger@v1
 
       - name: Login to Amazon ECR
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
