@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+options {
+    disableConcurrentBuilds()
+    skipDefaultCheckout(true)
+}
     environment {
         AWS_REGION = 'eu-north-1'
         AWS_ACCOUNT_ID = '732963826383'
